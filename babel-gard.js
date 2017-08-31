@@ -2,6 +2,9 @@ var fs = require("fs"),
   _ = require("lodash"),
   jsdom = require("jsdom");
 
+/*
+ * returns model information from ga_details file
+ */
 function getModels(filename) {
   var format_breakpoint = function(bp) {
     var bps = bp.split(",");
@@ -32,12 +35,15 @@ function getModels(filename) {
   });
 }
 
+/*
+ * gets rate matrix from generated html file
+ */
 function getRateMatrix(filename) {
   // first add model information
   return new Promise((resolve, reject) => {
     fs.readFile(filename, (err, data) => {
-      // read in data into models format
-      // split data into every two lines
+      // read in data into jsdom
+      // then get all cells
       var dom = new jsdom.JSDOM(String(data));
       var tds = dom.window.document.querySelectorAll("td");
 
@@ -54,6 +60,9 @@ function getRateMatrix(filename) {
   });
 }
 
+/*
+ * gets tree information from NEXUS file
+ */
 function getBreakpointData(filename) {
   // first add model information
   return new Promise((resolve, reject) => {
@@ -96,6 +105,7 @@ function getBreakpointData(filename) {
       });
 
       resolve(bp_data);
+
     });
   });
 }
