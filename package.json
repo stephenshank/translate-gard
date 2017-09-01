@@ -1,5 +1,5 @@
 {
-  "name": "babel-gard",
+  "name": "translate-gard",
   "version": "0.0.0",
   "description": "Convert HyPhy 2.3.2 output to JSON",
   "main": "babel-gard.js",
