@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/veg/babel-gard.git"
+    "url": "git+https://github.com/veg/translate-gard.git"
   },
   "keywords": [
     "hyphy",
@@ -27,7 +27,7 @@
   "author": "Steven Weaver",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/veg/babel-gard/issues"
+    "url": "https://github.com/veg/translate-gard/issues"
   },
-  "homepage": "https://github.com/veg/babel-gard#readme"
+  "homepage": "https://github.com/veg/translate-gard#readme"
 }
