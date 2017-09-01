@@ -39,7 +39,6 @@ function getModels(filename) {
  * gets rate matrix from generated html file
  */
 function getRateMatrix(filename) {
-  // first add model information
   return new Promise((resolve, reject) => {
     fs.readFile(filename, (err, data) => {
       // read in data into jsdom
@@ -59,6 +58,26 @@ function getRateMatrix(filename) {
     });
   });
 }
+
+/*
+ * gets baseline score from generated html file
+ */
+function getBaselineScore(filename) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filename, (err, data) => {
+
+      // read in data into jsdom
+      // then get all cells
+      var dom = new jsdom.JSDOM(String(data));
+      var spans = dom.window.document.querySelectorAll("span");
+
+      var baseline_score = parseFloat(_.last(spans).innerHTML);
+      resolve(baseline_score);
+
+    });
+  });
+}
+
 
 /*
  * gets tree information from NEXUS file
@@ -99,6 +118,7 @@ function getBreakpointData(filename) {
         return _.map(bp.split("-"), _.unary(parseInt));
       });
 
+      // zip partitions and trees
       bp_data = _.zip(trees, parts);
       bp_data = _.map(bp_data, d => {
         return { tree: d[0], bps: d[1] };
@@ -125,13 +145,15 @@ function toJSON(files, cb) {
   Promise.all([
     getModels(files.ga_details),
     getRateMatrix(files.html),
+    getBaselineScore(files.html),
     getBreakpointData(files.finalout)
   ]).then(values => {
 
     var gard = {};
     gard.models = values[0];
     gard.rateMatrix = values[1];
-    gard.breakpointData = values[2];
+    gard.baselineScore = values[2];
+    gard.breakpointData = values[3];
     gard.totalModelCount = values[0].length;
     cb(null, gard);
 

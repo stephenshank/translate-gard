@@ -3,7 +3,7 @@ var fs = require('fs'),
     babel_gard = require('../babel-gard.js');
 
 
-describe('gard transpiler', function() {
+describe('gard translater', function() {
 
   it('should have expected keys', function(done) {
 
@@ -18,6 +18,9 @@ describe('gard transpiler', function() {
       gard.should.have.property('breakpointData');
       gard.should.have.property('rateMatrix');
       gard.should.have.property('models');
+      gard.should.have.property('baselineScore').approximately(7126.6, .1);
+      // write to file once
+      fs.writeFileSync('gard.json', JSON.stringify(gard));
       done();
     });
 
