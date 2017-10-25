@@ -1,6 +1,6 @@
 var fs = require('fs'),
     should = require('should'),
-    babel_gard = require('../babel-gard.js');
+    babel_gard = require('../translate-gard.js');
 
 
 describe('gard translater', function() {
