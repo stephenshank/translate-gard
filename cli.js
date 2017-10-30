@@ -3,7 +3,7 @@ var translate_gard = require('./translate-gard.js'),
   pd = require('pretty-data').pd,
   fs = require('fs');
 
-var filename = process.argv[2],
+var filename = process.argv[process.argv.length-1],
   files = {
     html : filename,
     finalout : filename + '_finalout',

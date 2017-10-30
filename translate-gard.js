@@ -30,7 +30,25 @@ function getModels(filename) {
         };
       });
 
-      resolve(models);
+      var breakpoint_groups = _.groupBy(models, d=>d.breakpoints.length);
+      var improvements = _.mapValues(breakpoint_groups, val => {
+        return val.reduce((a,b) => +a.aicc <= +b.aicc ? a : b);
+      });
+      var formatted = [];
+      _.each(improvements, (val, key) => {
+        formatted[+key-2] = {
+          aicc: +val.aicc,
+          breakpoints: val.breakpoints
+            .slice(1, val.breakpoints.length)
+            .map(bps=>bps[0]-1)
+        };
+      }); 
+      formatted.pop();
+
+      resolve({
+        models: models,
+        improvements: formatted 
+      });
     });
   });
 }
@@ -149,12 +167,23 @@ function toJSON(files, cb) {
     getBreakpointData(files.finalout)
   ]).then(values => {
 
-    var gard = {};
-    gard.models = values[0];
+    var gard = {},
+      improvements = values[0].improvements,
+      baselineScore = values[2];
+    gard.models = values[0].models;
     gard.rateMatrix = values[1];
-    gard.baselineScore = values[2];
+    gard.baselineScore = baselineScore;
     gard.breakpointData = values[3];
     gard.totalModelCount = values[0].length;
+    if(improvements[0].aicc <= baselineScore){
+      gard.improvements = improvements.map((d,i) => {
+        var otherAIC = i == 0 ? gard.baselineScore : improvements[i-1].aicc;
+        return {
+          deltaAICc: otherAIC - d.aicc,
+          breakpoints: d.breakpoints
+        };
+      });
+    }
     cb(null, gard);
 
   });
