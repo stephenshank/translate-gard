@@ -30,31 +30,25 @@ function getModels(filename) {
         };
       });
 
-      resolve(models);
-    });
-  });
-}
+      var breakpoint_groups = _.groupBy(models, d=>d.breakpoints.length);
+      var improvements = _.mapValues(breakpoint_groups, val => {
+        return val.reduce((a,b) => +a.aicc <= +b.aicc ? a : b);
+      });
+      var formatted = [];
+      _.each(improvements, (val, key) => {
+        formatted[+key-2] = {
+          aicc: +val.aicc,
+          breakpoints: val.breakpoints
+            .slice(1, val.breakpoints.length)
+            .map(bps=>bps[0]-1)
+        };
+      }); 
+      formatted.pop();
 
-/*
- * gets rate matrix from generated html file
- */
-function getRateMatrix(filename) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(filename, (err, data) => {
-      // read in data into jsdom
-      // then get all cells
-      var dom = new jsdom.JSDOM(String(data));
-      var tds = dom.window.document.querySelectorAll("td");
-
-      // convert each row in table to matrix row
-      var rate_matrix = _.chunk(
-        _.map(tds, td => {
-          return td.innerHTML;
-        }),
-        4
-      );
-
-      resolve(rate_matrix);
+      resolve({
+        models: models,
+        improvements: formatted 
+      });
     });
   });
 }
@@ -144,17 +138,26 @@ function toJSON(files, cb) {
 
   Promise.all([
     getModels(files.ga_details),
-    getRateMatrix(files.html),
     getBaselineScore(files.html),
     getBreakpointData(files.finalout)
   ]).then(values => {
 
-    var gard = {};
-    gard.models = values[0];
-    gard.rateMatrix = values[1];
-    gard.baselineScore = values[2];
-    gard.breakpointData = values[3];
+    var gard = {},
+      improvements = values[0].improvements,
+      baselineScore = values[1];
+    gard.models = values[0].models;
+    gard.baselineScore = baselineScore;
+    gard.breakpointData = values[2];
     gard.totalModelCount = values[0].length;
+    if(improvements[0].aicc <= baselineScore){
+      gard.improvements = improvements.map((d,i) => {
+        var otherAIC = i == 0 ? gard.baselineScore : improvements[i-1].aicc;
+        return {
+          deltaAICc: otherAIC - d.aicc,
+          breakpoints: d.breakpoints
+        };
+      });
+    }
     cb(null, gard);
 
   });
