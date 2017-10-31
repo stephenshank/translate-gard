@@ -6,7 +6,9 @@ var fs = require("fs"),
  * returns model information from ga_details file
  */
 function getModels(filename) {
+
   var format_breakpoint = function(bp) {
+
     var bps = bp.split(",");
     var fmt_bps = _.map(bps, bp => {
       return _.map(bp.split("-"), _.unary(parseInt));
@@ -17,6 +19,7 @@ function getModels(filename) {
 
   // first add model information
   return new Promise((resolve, reject) => {
+
     fs.readFile(filename, (err, data) => {
       // read in data into models format
       // split data into every two lines
@@ -124,13 +127,26 @@ function getBreakpointData(filename) {
   });
 }
 
+function getHyPhyJSON(filename) {
+
+  return new Promise((resolve, reject) => {
+    fs.readFile(filename, (err, data) => {
+      var obj = JSON.parse(data);
+      resolve(obj);
+    });
+  });
+
+
+}
+
 /*
   *@params files
   *{
   *   html: ./CD2.nex.csv,
   *   finalout: ./CD2.nex.csv_finalout,
   *   ga_details: ./CD2.nex.csv_ga_details,
-  *   splits: ./CD2.nex.csv_splits
+  *   splits: ./CD2.nex.csv_splits,
+  *   json: ./CD2.nex.json
   *}
   */
 function toJSON(files, cb) {
@@ -139,16 +155,19 @@ function toJSON(files, cb) {
   Promise.all([
     getModels(files.ga_details),
     getBaselineScore(files.html),
-    getBreakpointData(files.finalout)
+    getBreakpointData(files.finalout),
+    getHyPhyJSON(files.json)
   ]).then(values => {
 
     var gard = {},
       improvements = values[0].improvements,
       baselineScore = values[1];
+
     gard.models = values[0].models;
     gard.baselineScore = baselineScore;
     gard.breakpointData = values[2];
     gard.totalModelCount = values[0].length;
+
     if(improvements[0].aicc <= baselineScore){
       gard.improvements = improvements.map((d,i) => {
         var otherAIC = i == 0 ? gard.baselineScore : improvements[i-1].aicc;
@@ -158,6 +177,9 @@ function toJSON(files, cb) {
         };
       });
     }
+
+    // combine JSON from HyPhy
+    Object.assign(gard, values[3]);
     cb(null, gard);
 
   });
