@@ -54,30 +54,6 @@ function getModels(filename) {
 }
 
 /*
- * gets rate matrix from generated html file
- */
-function getRateMatrix(filename) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(filename, (err, data) => {
-      // read in data into jsdom
-      // then get all cells
-      var dom = new jsdom.JSDOM(String(data));
-      var tds = dom.window.document.querySelectorAll("td");
-
-      // convert each row in table to matrix row
-      var rate_matrix = _.chunk(
-        _.map(tds, td => {
-          return td.innerHTML;
-        }),
-        4
-      );
-
-      resolve(rate_matrix);
-    });
-  });
-}
-
-/*
  * gets baseline score from generated html file
  */
 function getBaselineScore(filename) {
@@ -162,18 +138,16 @@ function toJSON(files, cb) {
 
   Promise.all([
     getModels(files.ga_details),
-    getRateMatrix(files.html),
     getBaselineScore(files.html),
     getBreakpointData(files.finalout)
   ]).then(values => {
 
     var gard = {},
       improvements = values[0].improvements,
-      baselineScore = values[2];
+      baselineScore = values[1];
     gard.models = values[0].models;
-    gard.rateMatrix = values[1];
     gard.baselineScore = baselineScore;
-    gard.breakpointData = values[3];
+    gard.breakpointData = values[2];
     gard.totalModelCount = values[0].length;
     if(improvements[0].aicc <= baselineScore){
       gard.improvements = improvements.map((d,i) => {
