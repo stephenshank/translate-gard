@@ -1,6 +1,6 @@
 {
   "name": "translate-gard",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Convert HyPhy output to JSON",
   "main": "translate-gard.js",
   "directories": {
@@ -10,6 +10,7 @@
   "dependencies": {
     "jsdom": "^11.2.0",
     "lodash": "^4.17.4",
+    "optimist": "^0.6.1",
     "prettier": "^1.6.1",
     "pretty-data": "^0.40.0",
     "should": "^12.0.0"
