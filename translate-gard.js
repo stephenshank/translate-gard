@@ -9,6 +9,10 @@ function getModels(filename) {
 
   var format_breakpoint = function(bp) {
 
+    if(bp === undefined) {
+      return "";
+    }
+
     var bps = bp.split(",");
     var fmt_bps = _.map(bps, bp => {
       return _.map(bp.split("-"), _.unary(parseInt));
@@ -87,6 +91,12 @@ function getBreakpointData(filename) {
 
       // Parse out TREE information
       var trees = nexus_file.split("BEGIN TREES;")[1];
+
+      if(trees == undefined) {
+        reject('failed getting bp data');
+        return;
+      }
+
       trees = trees.split("END;")[0];
 
       trees = _.map(trees.split("\n"), d => {
@@ -182,6 +192,9 @@ function toJSON(files, cb) {
     Object.assign(gard, values[3]);
     cb(null, gard);
 
+  }).catch(reason => {
+    console.log(reason);
+    cb(reason, null); 
   });
 
 }

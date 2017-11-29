@@ -32,4 +32,22 @@ describe('gard translater', function() {
 
   });
 
+  it('should handle exception gracefully', function(done) {
+
+    var files = {
+      html : './test/CD2.nex.GARD.csv',
+      finalout : './test/empty_finalout',
+      ga_details : './test/CD2.nex.GARD.csv_ga_details',
+      splits : './test/CD2.nex.GARD.csv_splits',
+      json : './test/CD2.nex.out.json'
+    };
+
+    translate_gard.toJSON(files, (err, gard) => {
+      should.exist(err);
+      done();
+    });
+
+  });
+
+
 });
