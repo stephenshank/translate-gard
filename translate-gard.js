@@ -10,7 +10,7 @@ function getModels(filename) {
   var format_breakpoint = function(bp) {
 
     if(bp === undefined) {
-      return "";
+      return [];
     }
 
     var bps = bp.split(",");
@@ -25,9 +25,15 @@ function getModels(filename) {
   return new Promise((resolve, reject) => {
 
     fs.readFile(filename, (err, data) => {
+
       // read in data into models format
       // split data into every two lines
       var strings = _.chunk(String(data).trim().split("\n"), 2);
+
+      if(strings.length <= 0) {
+        reject('empty ga_details file');
+        return;
+      }
 
       // format the models object
       var models = _.map(strings, d => {
@@ -41,14 +47,23 @@ function getModels(filename) {
       var improvements = _.mapValues(breakpoint_groups, val => {
         return val.reduce((a,b) => +a.aicc <= +b.aicc ? a : b);
       });
+
       var formatted = [];
+
       _.each(improvements, (val, key) => {
+
+        if(val.breakpoints.length === undefined) {
+          reject('failed getting bp data');
+          return;
+        }
+
         formatted[+key-2] = {
           aicc: +val.aicc,
           breakpoints: val.breakpoints
             .slice(1, val.breakpoints.length)
             .map(bps=>bps[0]-1)
         };
+
       }); 
       formatted.pop();
 
@@ -64,13 +79,24 @@ function getModels(filename) {
  * gets baseline score from generated html file
  */
 function getBaselineScore(filename) {
+
   return new Promise((resolve, reject) => {
     fs.readFile(filename, (err, data) => {
+
+      if(err) {
+        reject('empty html file');
+        return;
+      }
 
       // read in data into jsdom
       // then get all cells
       var dom = new jsdom.JSDOM(String(data));
       var spans = dom.window.document.querySelectorAll("span");
+
+      if(_.last(spans) === undefined) {
+        reject('malformed html file');
+        return;
+      }
 
       var baseline_score = parseFloat(_.last(spans).innerHTML);
       resolve(baseline_score);
@@ -141,8 +167,15 @@ function getHyPhyJSON(filename) {
 
   return new Promise((resolve, reject) => {
     fs.readFile(filename, (err, data) => {
-      var obj = JSON.parse(data);
-      resolve(obj);
+
+      try {
+        var obj = JSON.parse(data);
+        resolve(obj);
+      } catch(e) {
+        reject('empty gard json file');
+        return;
+      }
+
     });
   });
 
@@ -193,8 +226,8 @@ function toJSON(files, cb) {
     cb(null, gard);
 
   }).catch(reason => {
-    console.log(reason);
     cb(reason, null); 
+    return;
   });
 
 }

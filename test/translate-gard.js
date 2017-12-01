@@ -36,7 +36,7 @@ describe('gard translater', function() {
 
     var files = {
       html : './test/CD2.nex.GARD.csv',
-      finalout : './test/empty_finalout',
+      finalout : './test/empty_file',
       ga_details : './test/CD2.nex.GARD.csv_ga_details',
       splits : './test/CD2.nex.GARD.csv_splits',
       json : './test/CD2.nex.out.json'
@@ -49,5 +49,72 @@ describe('gard translater', function() {
 
   });
 
+  it('should handle empty ga_details gracefully', function(done) {
+
+    var files = {
+      html : './test/CD2.nex.GARD.csv',
+      finalout : './test/CD2.nex.GARD.csv_finalout',
+      ga_details : './empty_file',
+      splits : './test/CD2.nex.GARD.csv_splits',
+      json : './test/CD2.nex.out.json'
+    };
+
+    translate_gard.toJSON(files, (err, gard) => {
+      should.exist(err);
+      done();
+    });
+
+  });
+
+  it('should handle empty html file gracefully', function(done) {
+
+    var files = {
+      html : './test/empty_file',
+      finalout : './test/CD2.nex.GARD.csv_finalout',
+      ga_details : './test/CD2.nex.GARD.csv_ga_details',
+      splits : './test/CD2.nex.GARD.csv_splits',
+      json : './test/CD2.nex.out.json'
+    };
+
+    translate_gard.toJSON(files, (err, gard) => {
+      should.exist(err);
+      done();
+    });
+
+  });
+
+  it('should handle empty splits file gracefully', function(done) {
+
+    var files = {
+      html : './test/CD2.nex.GARD.csv',
+      finalout : './test/CD2.nex.GARD.csv_finalout',
+      ga_details : './test/CD2.nex.GARD.csv_ga_details',
+      splits : './test/empty_file',
+      json : './test/CD2.nex.out.json'
+    };
+
+    translate_gard.toJSON(files, (err, gard) => {
+      should.exist(err);
+      done();
+    });
+
+  });
+
+  it('should handle empty json file gracefully', function(done) {
+
+    var files = {
+      html : './test/CD2.nex.GARD.csv',
+      finalout : './test/CD2.nex.GARD.csv_finalout',
+      ga_details : './test/CD2.nex.GARD.csv_ga_details',
+      splits : './test/CD2.nex.GARD.csv_splits',
+      json : './test/empty_file'
+    };
+
+    translate_gard.toJSON(files, (err, gard) => {
+      should.exist(err);
+      done();
+    });
+
+  });
 
 });
