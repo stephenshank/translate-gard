@@ -1,6 +1,6 @@
 {
   "name": "translate-gard",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Convert HyPhy output to JSON",
   "main": "translate-gard.js",
   "directories": {

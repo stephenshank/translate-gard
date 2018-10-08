@@ -20,7 +20,7 @@ var filename = argv.i,
     finalout: filename + "_finalout",
     ga_details: filename + "_ga_details",
     splits: filename + "_splits",
-    json: filename + ".out.json"
+    json: filename + ".json"
   },
   output = output_fn;
 
