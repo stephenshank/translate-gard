@@ -79,7 +79,6 @@ function getModels(filename) {
  * gets baseline score from generated html file
  */
 function getBaselineScore(filename) {
-
   return new Promise((resolve, reject) => {
     fs.readFile(filename, (err, data) => {
 
@@ -98,7 +97,7 @@ function getBaselineScore(filename) {
         return;
       }
 
-      var baseline_score = parseFloat(_.last(spans).innerHTML);
+      var baseline_score = parseFloat(spans[2].innerHTML);
       resolve(baseline_score);
 
     });
